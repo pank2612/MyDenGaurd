@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = true;
         });
 
-       // googleLogin();
+        googleLogin();
       },
       child: Container(
         height: 40,

@@ -14,7 +14,7 @@ import 'package:guard/Constant/globalVeriable.dart' as globals;
 import 'GuradSignInScreen/SplashScreen.dart';
 import 'MainScreen/mainScreen.dart';
 
-// testing
+
 //test
 class SimpleBlocObserver extends BlocObserver {
   @override
@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
           title: globals.appName,
           // theme: AllCoustomTheme.getThemeData(),
           // routes: routes,
-          home: MainScreen()
+          home: SplashScreen()
       ),
     );
   }
