@@ -10,6 +10,7 @@ import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/GuradSignInScreen/TabBarScreen.dart';
 import 'package:guard/GuradSignInScreen/accessListScreen.dart';
 import 'package:guard/GuradSignInScreen/activationScreen.dart';
+import 'package:guard/GuradSignInScreen/passwordScreen.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -462,25 +463,18 @@ class _LoginPageState extends State<LoginPage> {
       _userData = context.bloc<AuthBloc>().getCurrentUser();
 
       if (_userData.accessList != null) {
-        if (_userData.accessList.length == 1) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-                return TabBarScreen();
-              }));
-        } else {
-          print("accesslist");
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-                return accessList();
-              }));
-        }
-      } else {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
-              return ActivationScreen();
+              return PasswordScreen();
             }));
+      }  else {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) {
+                return ActivationScreen();
+              }));
+        }
       }
-    });}
+    );}
 
 }
 

@@ -7,7 +7,7 @@ import 'package:guard/validation.dart';
 enum validationKey {email, payment, Description, activationCode, date, venue,
   time, device, gateNo, entrance, ownerName, towerNumber, familyMember, documentType,
   adharCard,panCard,  gender, password,username,mobileNo,otherMobileNo,name,companyName,
-  society, flatNo,controller,option,confirmPassword,validDocumentType,amenity,societyCode,vehical}
+  society, flatNo,controller,option,confirmPassword,validDocumentType,amenity,societyCode,vehical,guardPassword}
 
 class constantTextField {
 
@@ -73,7 +73,7 @@ class constantTextField {
         return inputValue.isValidSociety() ? null : "Enter Full Society Name";
         break;
       case validationKey.flatNo:
-        return inputValue.isValidTowerNo() ? null : "Enter Correct Flat Number";
+        return inputValue.isValidTowerNo() ? null : "Enter Capital Letter no space";
         break;
       case validationKey.payment:
         return inputValue.isValidPayment() ? null : "Enter payment";
@@ -135,6 +135,10 @@ class constantTextField {
         break;
       case validationKey.vehical:
         return inputValue.isValidVehicalNo() ? null : "Last Digit will be numeric only";
+        break;
+
+      case validationKey.guardPassword:
+        return inputValue.isGuardValid() ? null : "Enter 6 digit password";
         break;
 
 

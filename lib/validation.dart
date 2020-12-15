@@ -118,7 +118,7 @@ extension EmailValidator on String {
     ).hasMatch(this)  && this.length < 5 ? true : false;
   }
   bool isValidTowerNo(){
-    return RegExp(r'^[a-zA-Z0-9 ]+$'
+    return RegExp(r'^[A-Z0-9]+$'
     ).hasMatch(this) && this.length < 6 ? true : false;
   }
   bool isValidFamilyNo(){
@@ -159,6 +159,9 @@ extension EmailValidator on String {
   bool isValidVehicalNo(){
     return RegExp(
         r'(^[0-9]{4}$)').hasMatch(this);
+  }bool isGuardValid(){
+    return RegExp(
+        r'^[a-zA-Z0-9 ]+$').hasMatch(this) && this.length == 6  ? true : false ;
   }
 
 }

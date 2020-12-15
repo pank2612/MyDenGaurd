@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:guard/Bloc/AuthBloc.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/sharedPref.dart';
+import 'package:guard/GuradSignInScreen/passwordScreen.dart';
 import 'package:guard/GuradSignInScreen/signIn.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
 import 'package:guard/Constant/globalVeriable.dart' as global;
@@ -40,48 +41,29 @@ class _SplashScreenState extends State<SplashScreen> {
     _getUserData().then((fUser) {
 
       if(fUser!=null) {
-        print("fuser length");
-        print(fUser.accessList.length);
+
         if(!fUser.emailVerified){
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => EmailVerification()));
         }
-        else if( fUser.accessList != null && fUser.accessList.length == 1 ) {
+        else if( fUser.accessList != null && fUser.accessList.length == 1 && fUser.accessList[0].status == true ) {
           global.mainId = fUser.accessList[0].id.toString();
-          global.parentId = fUser.accessList[0].residentId.toString();
-          global.flatNo = fUser.accessList[0].flatNo.toString();
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => TabBarScreen()));
+              context, MaterialPageRoute(builder: (context) => PasswordScreen()));
         }
-        else if ( fUser.accessList != null && fUser.accessList.length > 1){
-          //shared Pref
-          savelocalCode().toGetDate(residentId).then((value){
-            print(value);
-            if(value!=null)
-            {
-              global.mainId = value;
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => accessList()));
-            }
-            else
-            {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => accessList()));
-            }
-
-          });
-        }
+        // else if ( fUser.accessList.length == 1 && fUser.accessList[0].status == false){
+        //   global.mainId = fUser.accessList[0].id.toString();
+        //   Navigator.pushReplacement(context,
+        //       MaterialPageRoute(builder: (context) => PasswordScreen()));
+        // }
         else {
-          global.mainId = fUser.accessList[0].id.toString();
-          global.parentId = fUser.accessList[0].residentId.toString();
-          global.flatNo = fUser.accessList[0].flatNo.toString();
+         // global.mainId = fUser.accessList[0].id.toString();
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => TabBarScreen()));
+              MaterialPageRoute(builder: (context) => LoginPage()));
         }
-      }
-      else {
-        print('Login Page');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
+      }else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => LoginPage()));
       }
     });
   }

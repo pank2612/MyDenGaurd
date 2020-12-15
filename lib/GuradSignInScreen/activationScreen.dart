@@ -3,15 +3,20 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:guard/Bloc/AuthBloc.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/sharedPref.dart';
+import 'package:guard/GuradSignInScreen/passwordScreen.dart';
 import 'package:guard/ModelClass/ActivationModel.dart';
+import 'package:guard/ModelClass/Devices.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:imei_plugin/imei_plugin.dart';
+import 'package:uuid/uuid.dart';
 
 import 'TabBarScreen.dart';
 
@@ -22,13 +27,8 @@ class ActivationScreen extends StatefulWidget {
 
 class _ActivationScreenState extends State<ActivationScreen> {
   TextEditingController _activationController = TextEditingController();
-  TextEditingController _societyController = TextEditingController();
   UserData _userData = UserData();
   List<ActivationCode> activationCodelist = List<ActivationCode>();
-  var society = [
-    'MilanDeep',
-    'MilanSar',
-  ];
 
   bool isLoading = false;
 
@@ -38,78 +38,101 @@ class _ActivationScreenState extends State<ActivationScreen> {
     print(_userData.email);
     print(_userData.uid);
     //  _getUserDetails();
-    // getActivationCode();
 
     super.initState();
+    initPlatformState();
+  }
+
+  String _platformImei = 'Unknown';
+  String uniqueId = "Unknown";
+
+  Future<void> initPlatformState() async {
+    String platformImei;
+    String idunique;
+    try {
+      platformImei =
+          await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: false);
+      List<String> multiImei = await ImeiPlugin.getImeiMulti();
+      print(multiImei);
+      idunique = await ImeiPlugin.getId();
+    } on PlatformException {
+      platformImei = 'Failed to get platform version.';
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _platformImei = platformImei;
+
+      uniqueId = idunique;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height / 3,
-                    ),
-                    Text("Activated Code"),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Form(
-                        key: globals.formKey,
-                        child: Column(
-                          children: [
-                            constantTextField().InputField(
-                                "Enter Activation Code",
-                                "",
-                                validationKey.societyCode,
-                                _activationController,
-                                false,
-                                IconButton(
-                                    icon: Icon(Icons.remove_red_eye),
-                                    onPressed: () {}),
-                                1,
-                                1,
-                                TextInputType.emailAddress,
-                                false),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        )),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    RaisedButton(
-                      onPressed: () {
-                        getActivationCode();
-                      },
-                      child: Text("Submit"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              child: isLoading
-                  ? Container(
-                color: Colors.transparent,
-                child: Center(child: CircularProgressIndicator()),
-              )
-                  : Container(),
-            ),
-          ],
-        ));
-  }
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
 
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 3,
+                ),
+                Text("Activated Code"),
+                SizedBox(
+                  height: 10,
+                ),
+                Form(
+                    key: globals.formKey,
+                    child: Column(
+                      children: [
+                        constantTextField().InputField(
+                            "Enter Activation Code",
+                            "",
+                            validationKey.societyCode,
+                            _activationController,
+                            false,
+                            IconButton(
+                                icon: Icon(Icons.remove_red_eye),
+                                onPressed: () {}),
+                            1,
+                            1,
+                            TextInputType.emailAddress,
+                            false),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    )),
+                SizedBox(
+                  height: 20,
+                ),
+                RaisedButton(
+                  onPressed: () {
+
+                    getActivationCode();
+                  },
+                  child: Text("Submit"),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          child: isLoading
+              ? Container(
+                  color: Colors.transparent,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : Container(),
+        ),
+      ],
+    ));
+  }
 
   Future<void> _showDialog() async {
     return showDialog<void>(
@@ -154,7 +177,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
           .collection('ActivationCode')
           .where("tokenNo", isEqualTo: _activationController.text)
           .where("enable", isEqualTo: true)
-          .where("type", isEqualTo: "Residents")
+          .where("type", isEqualTo: "Guard")
           .getDocuments()
           .then((value) {
         print(value.documents.length);
@@ -166,22 +189,16 @@ class _ActivationScreenState extends State<ActivationScreen> {
         if (value.documents.length == 1) {
           setState(() {
             globals.mainId = value.documents[0]["society"];
-            globals.parentId = value.documents[0]["iD"];
-            globals.flatNo = value.documents[0]["flatNo"];
             savelocalCode().toSaveStringValue(
                 residentHouseId, value.documents[0]["society"]);
-            savelocalCode().toSaveStringValue(
-                flatNoId, value.documents[0]["flatNo"]);
-            savelocalCode()
-                .toSaveStringValue(residentId, value.documents[0]["iD"]);
-            isLoading = true;
           });
           saveAccesList(value);
           disableSocietyId(value.documents[0]['iD']);
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => TabBarScreen()));
+                  builder: (BuildContext context) => PasswordScreen(
+                  )));
         } else {
           _showDialog();
         }
@@ -195,7 +212,10 @@ class _ActivationScreenState extends State<ActivationScreen> {
         .document(societyEnable)
         .updateData({"enable": false});
   }
-  saveAccesList(QuerySnapshot accessList,) {
+
+  saveAccesList(
+    QuerySnapshot accessList,
+  ) {
     accessList.documents.forEach((element) {
       Firestore.instance.collection("users").document(_userData.uid).setData({
         "accessList": FieldValue.arrayUnion(
@@ -204,31 +224,28 @@ class _ActivationScreenState extends State<ActivationScreen> {
               "id": element['society'],
               "type": element['type'],
               "status": true,
-              "residentId": element['iD'],
-              "master": element['master'],
-              'flatNo': element['flatNo']
             }
           ],
         ),
       }, merge: true);
-     // saveFamilyMembers(element['iD']);
+      SaveDevice(element['society'],);
     });
+
   }
 
-  // saveFamilyMembers(String houseId)  {
-  //   HouseMember houseMember = HouseMember(
-  //     id: _userData.uid,
-  //     enrolDate: DateTime.now(),
-  //     deactivateDate: DateTime.now(),
-  //     enable: true,
-  //   );
-  //    Firestore.instance
-  //       .collection(globals.SOCIETY)
-  //       .document(globals.mainId)
-  //       .collection(globals.HOUSES)
-  //       .document(houseId)
-  //       .collection("members")
-  //       .document(_userData.uid)
-  //       .setData(jsonDecode(jsonEncode(houseMember.toJson())));
-  // }
+  SaveDevice(String societyId) {
+    Devices devices = Devices(
+        activationDate: DateTime.now(),
+        deactivationDate: DateTime.now(),
+        enable: true,
+        imei: '$_platformImei');
+    Firestore.instance
+        .collection(globals.SOCIETY)
+        .document(societyId)
+        .collection("Devices")
+        .document('$_platformImei')
+        .setData(jsonDecode(jsonEncode(devices.toJson())));
+  }
+
+
 }

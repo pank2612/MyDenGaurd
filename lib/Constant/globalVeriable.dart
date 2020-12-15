@@ -10,7 +10,7 @@ import 'ConstantTextField.dart';
 
 //app
 const String appName = 'MyDen';
-const appType = "Residents";
+const appType = "Guard";
 //
 TextEditingController companycontroller = TextEditingController();
 TextEditingController companyImagecontroller = TextEditingController();
