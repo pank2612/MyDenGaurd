@@ -59,7 +59,7 @@ var day;
 var timeArray = ["Sunday","Monday","Tuesday","Wednesday","Thursday",'Friday','Saturday'];
 var dayArray = ["For 1 Days","For 2 Days","For 3 Days","For 4 Days","For 5 Days","For 10 Days","For 15 Days","For 20 Days","For 25 Days","For 30 Days"];
 
-
+var vehicle = ["MoterBike","Car","Scotter","SchoolVan"];
 
 
 var RWATokenMsg = "hello,this is yor unique Code dont't share it with another ";

@@ -28,19 +28,22 @@ class _MaidScreenState extends State<LocalService> {
       ),
       body: Padding(
         padding: EdgeInsets.all(15),
-        child: StreamBuilder(
-            stream: Firestore.instance.collection('ServiceName').snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) return const Text('loading....');
-              return ListView.builder(
-                  reverse: true,
-                  shrinkWrap: true,
-                  itemCount: snapshot.data.documents.length,
-                  itemBuilder: (context, index) {
-                    return _buildListItem(
-                        context, snapshot.data.documents[index]);
-                  });
-            }),
+        child:
+          StreamBuilder(
+               stream: Firestore.instance.collection('ServiceName').snapshots(),
+               builder: (context, snapshot) {
+                 if (!snapshot.hasData) return const Text('loading....');
+                 return ListView.builder(
+                     reverse: true,
+                     shrinkWrap: true,
+                     itemCount: snapshot.data.documents.length,
+                     itemBuilder: (context, index) {
+                       return _buildListItem(
+                           context, snapshot.data.documents[index]);
+                     });
+               }),
+
+
       ),
     );
   }

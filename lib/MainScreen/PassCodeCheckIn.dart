@@ -15,9 +15,13 @@ class PassCodeCheckIn extends StatefulWidget {
 
 class _PassCodeCheckInState extends State<PassCodeCheckIn> {
   TextEditingController _passwordController = TextEditingController();
+  TextEditingController _vehicleNameController = TextEditingController();
+  TextEditingController _vehicleNumberController = TextEditingController();
 
 
   final formKey = GlobalKey<FormState>();
+
+  bool showCheckBox = true;
 
   @override
   void initState() {
@@ -85,6 +89,78 @@ class _PassCodeCheckInState extends State<PassCodeCheckIn> {
                                     1,
                                     TextInputType.emailAddress,
                                     false),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      activeColor: UniversalVariables.background,
+                                      value: showCheckBox,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          showCheckBox = value;
+
+                                        });
+                                      },
+                                    ),
+                                    Text("Select Vehicle"),
+                                  ],
+                                ),
+                                !showCheckBox
+                                    ? Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        IgnorePointer(
+                                          child: constantTextField().
+                                          InputField("Select Vehicle", "",
+                                              validationKey.isValidVehicleType,
+                                              _vehicleNameController,
+                                              false,IconButton(icon: Icon(Icons.arrow_back_ios),
+                                                onPressed: (){},),1,1,TextInputType.name,false),
+                                        ),
+
+                                        Positioned(
+                                          right: 0,
+                                          child: Container(
+                                            alignment: Alignment.centerRight,
+                                            child: PopupMenuButton<String>(
+                                              icon: const Icon(Icons.arrow_downward),
+                                              onSelected: (String val) {
+                                                _vehicleNameController.text = val;
+
+                                              },
+                                              itemBuilder: (BuildContext context) {
+                                                return globals.vehicle
+                                                    .map<PopupMenuItem<String>>((String val) {
+                                                  return new PopupMenuItem(
+                                                      child: new Text(val), value: val);
+                                                }
+                                                ).toList();
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    constantTextField().InputField(
+                                        "Enter Vehicle Number",
+                                        "",
+                                        validationKey.vehical,
+                                        _vehicleNumberController,
+                                        false,
+                                        IconButton(
+                                            icon: Icon(Icons.remove_red_eye),
+                                            onPressed: () {}),
+                                        1,
+                                        1,
+                                        TextInputType.emailAddress,
+                                        false),
+                                  ],
+                                )
+                                    : Container(),
+
                               ],
                             ),
                           ),
@@ -113,7 +189,6 @@ class _PassCodeCheckInState extends State<PassCodeCheckIn> {
           .getDocuments()
           .then((value) {
         _showDialog(value);
-        print("QQQQQQ");
         value.documents.forEach((element) {
           print(element['token']);
           showSociety(element['id']);
@@ -286,10 +361,11 @@ class _PassCodeCheckInState extends State<PassCodeCheckIn> {
         .collection(globals.SOCIETY)
         .document(globals.mainId)
         .collection(globals.VISITORS)
-        .document(vistorsId).setData({"inOut": false},merge: true);
+        .document(vistorsId).setData({
+      "inOut": false,
+      "vehicleName": _vehicleNameController.text,
+      "vehicleNumber":_vehicleNumberController.text
+    },merge: true);
   }
-
-
-
-
+  
 }

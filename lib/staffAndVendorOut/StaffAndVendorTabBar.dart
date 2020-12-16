@@ -29,7 +29,6 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
 
   bool showInsideService = false;
   bool changeSociety = false;
-
   bool isLoading = false;
   bool hasMore = true;
   int documentLimit = 15;
@@ -395,7 +394,7 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
 
   _checkOut() async {
     print("start checkout");
-    final snapshot = await Firestore.instance
+    await Firestore.instance
         .collection(globals.SOCIETY)
         .document(globals.mainId)
         .collection(widget.staffType)
@@ -414,10 +413,7 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
         _showCheckOutDialog(value);
       });
     });
-    if (snapshot == null)  {
-      print(snapshot);
-      showScaffold("PlZ Enter correct password");
-    }
+
   }
 
   Future<void> _showCheckOutDialog(QuerySnapshot data) async {
@@ -487,15 +483,15 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        element['name'] + " CheckOut the Society",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 20),
-                      ),
-                    ],
-                  ),
+
+                     Expanded(
+                       child:  Text(
+                         element['name'] + " CheckOut the Society",
+                         style: TextStyle(
+                             fontWeight: FontWeight.w800, fontSize: 20),
+                       ),
+                     )
+
                 ],
               ),
             ),
@@ -602,15 +598,13 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        element['name'] + " CheckIn the Society",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 20),
-                      ),
-                    ],
-                  ),
+                  Expanded(
+                    child:  Text(
+                      element['name'] + " CheckIn the Society",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 20),
+                    ),
+                  )
                 ],
               ),
             ),

@@ -48,6 +48,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
     super.initState();
     globals.image = null;
     globals.type = 'Select Type';
+    globals.number = "0";
 
     _tabController = new TabController(length: 2, vsync: this);
   }
@@ -176,7 +177,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
                                     width: 5,
                                   ),
                                   Text(
-                                    "0",
+                                    globals.number ,
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w800),
@@ -305,6 +306,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
         value.documents.forEach((element) {
           Visitor visitor = Visitor(
               name: _nameController.text,
+              inviteBye: "Guard",
               mobileNumber: _mobileNumberController.text,
               visitorNumber: globals.number,
              visitorType: globals.type,
@@ -320,7 +322,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
               .document(globals.mainId)
               .collection('Visitors')
               .document(globals.uuid)
-              .setData(jsonDecode(jsonEncode(visitor.toJson())))
+              .setData(jsonDecode(jsonEncode(visitor.toJson())),merge: true)
               .then((value) {
             print("add djfltejer");
           });

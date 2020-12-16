@@ -2,7 +2,6 @@ import 'dart:convert';
 
 class Visitor {
   String houseId;
-
   String name;
   String mobileNumber;
   DateTime inviteDate;
@@ -17,13 +16,18 @@ class Visitor {
   String societyId;
   String firstInviteTime;
   String secondInviteTime;
+  String deletName;
+  String inviteBye;
   bool allDay;
   bool inOut;
+  bool accept;
 
   Visitor(
       {this.houseId,
         this.allDay,
         this.name,
+        this.inOut,
+        this.accept,
         this.mobileNumber,
         this.societyId,
         this.inviteDate,
@@ -36,7 +40,8 @@ class Visitor {
         this.ownerHouse,
         this.ownerMobileNumber,
         this.token,
-        this.inOut,
+        this.inviteBye,
+        this.deletName,
         this.id});
 
   Visitor.fromJson(Map<String, dynamic> json)
@@ -45,6 +50,8 @@ class Visitor {
         allDay = json['allDay'],
         id = json['id'],
         inOut = json['inOut'],
+        accept = json['accept'],
+        inviteBye = json['inviteBye'],
         secondInviteTime = json['secondInviteTime'],
         firstInviteTime = json['firstInviteTime'],
         societyId = json["societyId"],
@@ -55,17 +62,21 @@ class Visitor {
         ownerName = json['ownerName'],
         enable = json['enable'],
         token = json['token'],
+        deletName = json['deletName'],
         ownerMobileNumber = json['ownerMobileNumber'],
         ownerHouse = json['ownerHouse'];
 
   Map<String, dynamic> toJson() => {
     'houseId': houseId,
     'token': token,
-    'inOut':inOut,
     'allDay':allDay,
+    'inOut':inOut,
+    'accept':accept,
+    'deletName':deletName,
     'secondInviteTime': secondInviteTime,
     'firstInviteTime': firstInviteTime,
     'id': id,
+    'inviteBye':inviteBye,
     'name': name,
     'societyId': societyId,
     'ownerMobileNumber': ownerMobileNumber,
