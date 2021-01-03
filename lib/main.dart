@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -76,6 +77,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  StreamSubscription iosSubscription;
 
 
 
@@ -87,29 +90,47 @@ class _MyAppState extends State<MyApp> {
 
 
     super.initState();
-  }
 
-  showMessage(title, description) {
-    showDialog(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+    if (Platform.isIOS) {
+      iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
+      });
+      _fcm.requestNotificationPermissions(IosNotificationSettings());
+    }
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+       // GetExpectedVisitors();
+        print("onMessage: $message");
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(message['notification']['title']),
+              subtitle: Text(message['notification']['body']),
             ),
-            title: Text(title),
-            content: Text(description),
             actions: <Widget>[
               FlatButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                child: Text("Dismiss"),
-              )
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
             ],
-          );
-        });
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+
+
+
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+
+      },
+    );
   }
+
+
 
   void setCustomeTheme(int index) {
     setState(() {

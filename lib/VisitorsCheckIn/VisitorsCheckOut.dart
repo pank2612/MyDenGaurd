@@ -28,15 +28,15 @@ class _VisitorsCheckOutState extends State<VisitorsCheckOut>  with SingleTickerP
   ScrollController _scrollController = ScrollController();
   TabController _tabController;
 
-
-  String RandomPassword(int strlen) {
-    Random rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
-    String result = "";
-    for (var i = 0; i < strlen; i++) {
-      result += rnd.nextInt.toString();
-    }
-    return result;
-  }
+  //
+  // String RandomPassword(int strlen) {
+  //   Random rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
+  //   String result = "";
+  //   for (var i = 0; i < strlen; i++) {
+  //     result += rnd.nextInt.toString();
+  //   }
+  //   return result;
+  // }
 
   void showScaffold(String message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -184,10 +184,6 @@ class _VisitorsCheckOutState extends State<VisitorsCheckOut>  with SingleTickerP
                                     CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        width: MediaQuery.of(context)
-                                            .size
-                                            .width /
-                                            1.5,
                                         child: Text(
                                           visitorsList[index].name,
                                           style: TextStyle(

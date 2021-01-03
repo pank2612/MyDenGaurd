@@ -4,8 +4,10 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
@@ -269,7 +271,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
               RaisedButton(
                 color: UniversalVariables.background,
                 onPressed: () {
-                 visitors();
+                visitors();
                    globals.uuid = Uuid().v1();
                 },
                 child: Text(
@@ -296,6 +298,10 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
 
   visitors() {
     if (formKey.currentState.validate()) {
+      if(globals.type == "Select Visitor" || globals.number == "0"){
+        showScaffold("Select visitor type or Visitor Number");
+
+      }else{
       Firestore.instance
           .collection(globals.SOCIETY)
           .document(globals.mainId)
@@ -324,14 +330,110 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
               .document(globals.uuid)
               .setData(jsonDecode(jsonEncode(visitor.toJson())),merge: true)
               .then((value) {
-            print("add djfltejer");
-          });
+            _showDialog();
+
+          });sendNotificationToHouseMember(element['houseId']);
         });
-      });
+      });}
     }
   }
 
 
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  "Visitor is added Notification is send to the user mobile number",
+                  style: TextStyle(color: UniversalVariables.background),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            RaisedButton(
+              child: Text('ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  static Future<void> sendNotification(receiver, msg,) async {
+    final postUrl = 'https://fcm.googleapis.com/fcm/send';
 
+
+    final data = {
+      "notification": {"body": "Accept Reques", "title": msg},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "screen":"_showDialog",
+        "name":"hhhhh"
+
+      },
+      "apns": {
+        "payload": {
+          "aps": {
+            "mutable-content": 1
+          }
+        },
+        "fcm_options": {
+          "image": "https://aubergestjacques.com/wp-content/uploads/2017/04/check-out-1.png"
+        }
+      },
+      "to": "$receiver"
+    };
+
+
+    final headers = {'content-type': 'application/json', 'Authorization': globals.notificationKey};
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 5000,
+      receiveTimeout: 3000,
+      headers: headers,
+    );
+
+    try {
+      final response = await Dio(options).post(postUrl, data: jsonEncode(data));
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: 'Request Sent To HouseMember');
+        print('visitorName');
+      } else {
+        print('notification sending failed');
+      }
+    } catch (e) {
+      print('exception $e');
+    }
+  }
+
+  sendNotificationToHouseMember(String houseId) {
+    print('visitorName');
+    print(houseId);
+
+    Firestore.instance
+        .collection(globals.SOCIETY)
+        .document(globals.mainId)
+         .collection("HouseDevices")
+          .where("enable",isEqualTo: true)
+          .where("houseId",isEqualTo: houseId)
+        .getDocuments()
+        .then((value) {
+      value.documents.forEach((element) {
+        sendNotification(element['token'], _nameController.text +" is on Gate",);
+        print(element['token']);
+      });
+    });
+  }
 
 }

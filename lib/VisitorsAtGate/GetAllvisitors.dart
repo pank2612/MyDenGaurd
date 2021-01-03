@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/ModelClass/visitors.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
@@ -60,6 +64,9 @@ class _GetAllVisitorsState extends State<GetAllVisitors> {
                       return Padding(
                           padding: const EdgeInsets.only(left: 15, right: 15),
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                            ),
                             elevation: 10,
                             child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -277,4 +284,6 @@ class _GetAllVisitorsState extends State<GetAllVisitors> {
       isLoading = false;
     });
   }
+
+
 }

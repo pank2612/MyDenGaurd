@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
@@ -411,6 +414,7 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
             .document(element['documentNumber'])
             .setData({"passwordEnable": false}, merge: true).then(onGoBack);
         _showCheckOutDialog(value);
+        sendNotificationToHouseMember(element['documentNumber'],"is checkOut the society");
       });
     });
 
@@ -526,6 +530,8 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
             .document(element['documentNumber'])
             .setData({"passwordEnable": true}, merge: true).then(onGoBack);
         _showCheckInDialog(value);
+
+        sendNotificationToHouseMember(element['documentNumber'],'is checkIn the society');
         _passwordController.clear();
       });
     });
@@ -598,13 +604,13 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
                   SizedBox(
                     height: 10,
                   ),
-                  Expanded(
-                    child:  Text(
+
+                      Text(
                       element['name'] + " CheckIn the Society",
                       style: TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 20),
                     ),
-                  )
+
                 ],
               ),
             ),
@@ -620,6 +626,73 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
         },
       );
     });
+  }
+  
+  sendNotificationToHouseMember(String staffDocument,String msg1){
+    print(staffDocument);
+    print("gfjhfj");
+    print(widget.staffType);
+    Firestore.instance.collection(globals.SOCIETY)
+        .document(globals.mainId)
+        .collection("HouseDevices")
+         .where(widget.staffType,isEqualTo: staffDocument)
+        .where("enable",isEqualTo: true)
+        .getDocuments().then((value) {
+      value.documents.forEach((element) {
+        print(element['token']);
+        print("hhhhhh");
+        sendNotification(element['token'], widget.staffType, msg1) ;
+      });
+    });
+  }
+
+
+  static Future<void> sendNotification(receiver, msg,name) async {
+    final postUrl = 'https://fcm.googleapis.com/fcm/send';
+
+
+    final data = {
+      "notification": {"body": name, "title": msg},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "screen":"FullDetails",
+        "name":"hhhhh"
+
+      },
+      "apns": {
+        "payload": {
+          "aps": {
+            "mutable-content": 1
+          }
+        },
+        "fcm_options": {
+          "image": "https://aubergestjacques.com/wp-content/uploads/2017/04/check-out-1.png"
+        }
+      },
+      "to": "$receiver"
+    };
+
+
+    final headers = {'content-type': 'application/json', 'Authorization': globals.notificationKey};
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 5000,
+      receiveTimeout: 3000,
+      headers: headers,
+    );
+
+    try {
+      final response = await Dio(options).post(postUrl, data: jsonEncode(data));
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: 'Request Sent To HouseMember');
+      } else {
+        print('notification sending failed');
+      }
+    } catch (e) {
+      print('exception $e');
+    }
   }
 
   FutureOr onGoBack(dynamic value) {

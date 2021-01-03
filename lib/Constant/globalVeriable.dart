@@ -23,7 +23,7 @@ TextEditingController nameController = TextEditingController();
 var isLight = true;
 var hourList = ["1 hour","2 hour","3 hour"];
 var mainId = "";
-var parentId = "";
+//var parentId = "";
 var flatNo = "";
 String tokn;
 String uuid;
@@ -45,6 +45,9 @@ File image;
 int imageQuelity = 5;
 
 String photoUrl = "";
+var notificationKey =
+    "key=AAAA7benEuU:APA91bE4pXVdtbXFYWyutC-cCxY76Gt30jDyR0og8iX8f6Jkbo0GLdc95kNusJrXjxPsVOvYsmaY4q7FbP2CH7lqWZtcUKJzUL5rA1oekx1WCo6IEoym4RcSELEt3y0LkiFciAQyvn3y";
+
 
 
 //ExpectedVisitor

@@ -94,8 +94,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     ),
                     RaisedButton(
                       onPressed: () {
-                        getActivationCode();
+                      //  Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                       //
                         //getActivationCode();
+                        getActivationCode();
                       },
                       child: Text("Submit"),
                     ),
@@ -120,10 +122,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
     if (globals.formKey.currentState.validate()) {
       await Firestore.instance
           .collection(globals.SOCIETY)
-          .document(globals.mainId).get(source: Source.server).then((value) {
-            print("${value['password']}");
+          .getDocuments()
+        .then((value) {
+          print(value.documents[0]['password']);
+            print("${value.documents[0]['password']}");
 
-            if("${value['password']}" == _passwordController.text){
+            if("${value.documents[0]['password']}" == _passwordController.text){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
             } else{
               _showDialog();

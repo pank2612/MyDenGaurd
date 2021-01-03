@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:guard/Constant/globalVeriable.dart';
 import 'package:guard/GuradSignInScreen/activationScreen.dart';
 import 'package:guard/GuradSignInScreen/emailVerification.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
@@ -79,7 +81,7 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
     print(
         'EmailVerified    ${user.toString() + user.isEmailVerified.toString() + user.email.toString()}');
     await user.sendEmailVerification();
-    await Navigator.push(
+    await Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EmailVerification(
@@ -142,7 +144,11 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
         );
 
         _saveUserDatatoFirestore(authResult);
+        _userData =  await _userFromFirebase(authResult.user);
+        print(jsonEncode(_userData));
+        print("aaaa");
         add(AuthBlocEvent.setUpdate);
+        return _userData;
       } else {
         throw PlatformException(
           code: 'ERROR_MISSING_GOOGLE_AUTH_TOKEN',
@@ -197,8 +203,8 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
   }
 
   Future<UserData> _getUserDatatoFirestore(String uid) async {
-  //  var path = USERS;
-    var documentReference = _firestore.collection('users').document(uid);
+    var path = USERS;
+    var documentReference = _firestore.collection(path).document(uid);
 
     DocumentSnapshot documentSnapshot =
     await documentReference.get(source: Source.serverAndCache);
@@ -225,10 +231,12 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
   }
 
   Future<void> _saveUserDatatoFirestore(AuthResult result) async {
-   // var path = USERS;
+    var path = USERS;
     var documentReference =
-    _firestore.collection('users').document(result.user.uid);
+    _firestore.collection(path).document(result.user.uid);
     _userData = getGoogleAttributes(result);
+    print(_userData);
+    print("AuthBlock");
 //    globals.userdata = _userData;
     await documentReference.setData(_userData.toJson(),merge: true);
   }

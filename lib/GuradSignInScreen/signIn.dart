@@ -1,5 +1,7 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,11 +9,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:guard/Bloc/AuthBloc.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
-import 'package:guard/GuradSignInScreen/TabBarScreen.dart';
-import 'package:guard/GuradSignInScreen/accessListScreen.dart';
 import 'package:guard/GuradSignInScreen/activationScreen.dart';
 import 'package:guard/GuradSignInScreen/passwordScreen.dart';
-import 'package:guard/ModelClass/userModelClass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
@@ -29,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     ));
   }
 
-  UserData _userData = UserData();
+
 
 
   TextEditingController _passwordController = TextEditingController();
@@ -460,9 +459,9 @@ class _LoginPageState extends State<LoginPage> {
 
   void googleLogin() {
     context.bloc<AuthBloc>().signInWithGoogle().then((value) {
-      _userData = context.bloc<AuthBloc>().getCurrentUser();
-
-      if (_userData.accessList != null) {
+      var socityId = value.accessList[0].id;
+      _tokenRegister(value.uid,socityId,);
+      if (value.accessList != null) {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
               return PasswordScreen();
@@ -475,6 +474,26 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     );}
+
+  _tokenRegister(String uid,String societyId,) {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.getToken().then((token) {
+      print(token);
+      Firestore.instance.collection("users").document(uid).setData({
+        "token": token
+      }, merge: true);
+      saveTokenTosociety(token,uid,societyId,);
+    });
+  }
+
+  saveTokenTosociety(String token,String uid,String societyId,) {
+    Firestore.instance.collection("Society").document(societyId)
+        .collection("GuardDevices").document(uid)
+        .setData({
+      "enable":true,
+      "token": token,
+    },merge: true);
+  }
 
 }
 
