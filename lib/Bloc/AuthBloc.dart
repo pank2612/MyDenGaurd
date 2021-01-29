@@ -1,20 +1,19 @@
 import 'dart:convert';
 import 'dart:core';
+
+import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
-import 'package:bloc/bloc.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/material.dart';
 import 'package:guard/Constant/globalVeriable.dart';
 import 'package:guard/GuradSignInScreen/activationScreen.dart';
 import 'package:guard/GuradSignInScreen/emailVerification.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
 
-
 class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
-
-
   AuthBloc() : super(AuthBlocState.initial());
 
   final _firebaseAuth = FirebaseAuth.instance;
@@ -51,7 +50,6 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
       add(AuthBlocEvent.setUpdate);
       return _userData;
     }
-
   }
 
   Future<UserData> signInWithEmailAndPassword(
@@ -84,51 +82,41 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
     await Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => EmailVerification(
-        ),
+        builder: (context) => EmailVerification(),
       ),
     );
-
   }
-
-
-
 
   Future<UserData> checkEmailVerification(BuildContext context) async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    final current =   await _auth.currentUser();
+    final current = await _auth.currentUser();
     try {
       print("click");
-      if(current.isEmailVerified){
+      if (current.isEmailVerified) {
         print("Emailid verify");
 
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => ActivationScreen()));
-      }else{
+      } else {
         print("Email id is not verified");
 
         // showScaffold("First Verify Your email id");
       }
-
-    }catch(e){
+    } catch (e) {
       print(e.toString());
     }
   }
 
   Future<UserData> resendEmailVerification() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    final current =   await _auth.currentUser();
+    final current = await _auth.currentUser();
     try {
       current.sendEmailVerification();
       print("link is send");
-
-    }catch(e){
+    } catch (e) {
       print(e.toString());
     }
   }
-
-
-
 
   Future<UserData> signInWithGoogle() async {
     final googleSignIn = GoogleSignIn();
@@ -144,7 +132,7 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
         );
 
         _saveUserDatatoFirestore(authResult);
-        _userData =  await _userFromFirebase(authResult.user);
+        _userData = await _userFromFirebase(authResult.user);
         print(jsonEncode(_userData));
         print("aaaa");
         add(AuthBlocEvent.setUpdate);
@@ -207,7 +195,7 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
     var documentReference = _firestore.collection(path).document(uid);
 
     DocumentSnapshot documentSnapshot =
-    await documentReference.get(source: Source.serverAndCache);
+        await documentReference.get(source: Source.serverAndCache);
 
     if (!documentSnapshot.exists) {
       documentSnapshot = await documentReference.get(source: Source.server);
@@ -233,12 +221,12 @@ class AuthBloc extends Bloc<AuthBlocEvent, AuthBlocState> {
   Future<void> _saveUserDatatoFirestore(AuthResult result) async {
     var path = USERS;
     var documentReference =
-    _firestore.collection(path).document(result.user.uid);
+        _firestore.collection(path).document(result.user.uid);
     _userData = getGoogleAttributes(result);
     print(_userData);
     print("AuthBlock");
 //    globals.userdata = _userData;
-    await documentReference.setData(_userData.toJson(),merge: true);
+    await documentReference.setData(_userData.toJson(), merge: true);
   }
 
   UserData getGoogleAttributes(AuthResult result) {
@@ -266,12 +254,8 @@ class AuthBlocState {
   }
 
   AuthBlocState copyWith({UserData userData, bool authUser}) {
-    return AuthBlocState(
-        userData: userData ?? this.userData);
+    return AuthBlocState(userData: userData ?? this.userData);
   }
 }
-
-
-
 
 enum LoginFlag { emailFlag, facebookFlag, googleFlag, phoneFlag }

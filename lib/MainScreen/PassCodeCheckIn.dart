@@ -196,7 +196,6 @@ class _PassCodeCheckInState extends State<PassCodeCheckIn> {
           .then((value) {
         value.documents.forEach((element) {
           _showDialog(value);
-          print(element['token']);
           addVehicleSociety(element['id']);
           sendNotificationToHouseMember(element['houseId'],element['name']);
         });

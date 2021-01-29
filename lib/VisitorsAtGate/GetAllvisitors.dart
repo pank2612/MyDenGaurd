@@ -228,7 +228,9 @@ class _GetAllVisitorsState extends State<GetAllVisitors> {
 
   getExpectedVisitors(
     DocumentSnapshot _lastDocument,
-  ) async {
+  )
+
+  async {
     if (!hasMore) {
       print('No More Data');
       return;
@@ -242,6 +244,10 @@ class _GetAllVisitorsState extends State<GetAllVisitors> {
     QuerySnapshot querySnapshot;
     if (_lastDocument == null) {
       visitorsList.clear();
+      print(globals.SOCIETY);
+      print(globals.mainId);
+      print(globals.VISITORS);
+
       querySnapshot = await Firestore.instance
           .collection(globals.SOCIETY)
           .document(globals.mainId)

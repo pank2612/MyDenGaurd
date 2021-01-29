@@ -19,7 +19,6 @@ class UserData {
     this.name,
     this.email,
     this.phoneNo,
-
     this.gender,
     this.flatNo,
     this.profilePhoto,
@@ -60,9 +59,7 @@ class UserData {
           accessList.id = mapData['accessList'][i]['id'];
           accessList.type = mapData['accessList'][i]['type'];
           accessList.status = mapData['accessList'][i]["status"];
-          accessList.societyName = mapData['accessList'][i]['societyName'];
-          accessList.residentId = mapData['accessList'][i]['residentId'];
-          accessList.flatNo = mapData['accessList'][i]['flatNo'];
+
           print(accessList);
           mainAccessList.add(accessList);
         }}
@@ -77,26 +74,20 @@ class AccessList{
   String id;
   bool status;
   String type;
-  String societyName;
-  String residentId;
-  String flatNo;
+
 
   AccessList({
     this.id,
     this.status,
     this.type,
-    this.societyName,
-    this.residentId,
-    this.flatNo
+
   });
   Map toMap(AccessList obj) {
     var data = Map<String, dynamic>();
     data['id'] = obj.id;
     data['status'] = obj.status;
     data['type'] = obj.type;
-    data['flatNo'] = obj.flatNo;
-    data['societyName'] = obj.societyName;
-    data['residentId'] = obj.residentId;
+
 
     return data;
   }
@@ -104,9 +95,7 @@ class AccessList{
     this.id = mapData['id'];
     this.status = mapData['status'];
     this.type = mapData['type'];
-    this.flatNo = mapData['flatNo'];
-    this.societyName = mapData['societyName'];
-    this.residentId = mapData['residentId'];
+
   }
 
 }

@@ -89,6 +89,8 @@ const TRANSACTIONS = 'Transactions';
 const SOCIETY = "Society";
 const VISITORS = "Visitors";
 const HOUSES = "Houses";
+const HOUSESDEVICES = "HouseDevices";
+const LOCALSERVICES = "LocalServices";
 
 final formKey = GlobalKey<FormState>();
 

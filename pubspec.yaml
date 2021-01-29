@@ -50,6 +50,7 @@ dependencies:
   imei_plugin: ^1.2.0
   firebase_messaging: ^5.0.4
   dio: ^3.0.10
+ # awesome_notifications: ^0.0.5+4
 
 
 

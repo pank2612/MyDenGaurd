@@ -29,8 +29,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
-
-
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
 
@@ -62,8 +60,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Widget _submitButton(
-      TextEditingController email, TextEditingController password) {
+  Widget _submitButton(TextEditingController email, TextEditingController password) {
     return GestureDetector(
       onTap: () {
         if (formKey.currentState.validate()) {
@@ -459,9 +456,9 @@ class _LoginPageState extends State<LoginPage> {
 
   void googleLogin() {
     context.bloc<AuthBloc>().signInWithGoogle().then((value) {
-      var socityId = value.accessList[0].id;
-      _tokenRegister(value.uid,socityId,);
       if (value.accessList != null) {
+        var socityId = value.accessList[0].id;
+        _tokenRegister(value.uid,socityId,);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
               return PasswordScreen();

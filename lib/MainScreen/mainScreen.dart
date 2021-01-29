@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:guard/Bloc/AuthBloc.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/GuradSignInScreen/activationScreen.dart';
@@ -158,7 +159,7 @@ class _MainScreenState extends State<MainScreen> {
       "https://static-s.aa-cdn.net/img/gp/20600003668724/XvTPINgieeXN06Yke_vvQFFJY9O4GRFZhx3L8myKTIyLmTdVMotkOiparqwpgWRQfok=w300?v=1"
     },
     {
-      'name': "Staff & Vendor Out",
+      'name': "Staff & Vendor list",
       'secondName': 'Staff & Vendor Out',
       'image':
       "https://www.manageteamz.com/blog/wp-content/uploads/2019/12/Grocery-Delivery.png"
@@ -178,6 +179,12 @@ class _MainScreenState extends State<MainScreen> {
       'name': "Car IN/OUT",
       'secondName': 'Car IN/OUT',
       'image': "https://www.shareicon.net/data/2015/06/05/49543_polls_256x256.png"
+    },
+    {
+      'name': "Staff & Vendor Out",
+      'secondName': 'Staff & Vendor Out',
+      'image':
+      "https://www.manageteamz.com/blog/wp-content/uploads/2019/12/Grocery-Delivery.png"
     },
 
 

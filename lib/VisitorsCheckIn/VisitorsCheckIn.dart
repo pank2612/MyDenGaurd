@@ -86,32 +86,29 @@ class _VendorsScreenState extends State<VisitorsCheckIn> {
                                     Row(
                                       children: [
                                         CircleAvatar(
-                                          backgroundColor: UniversalVariables.background,
-                                          minRadius: 25,
-                                                  child: visitorsList[index]
-                                                              .inOut ==
-                                                          false
-                                                      ? Text(
-                                                          "IN",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              fontSize: 30,
-                                                              color:
-                                                                  Colors.green),
-                                                        )
-                                                      : Text(
-                                                          "",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              fontSize: 25,
-                                                              color:
-                                                                  Colors.green),
-                                                        ),
-                                                ),
+                                            backgroundColor: UniversalVariables.background,
+                                            minRadius: 30,
+                                            child: visitorsList[index]
+                                                .inOut ==
+                                                false
+                                                ? Text("IN",
+                                              style: TextStyle(
+                                                  fontWeight:
+                                                  FontWeight
+                                                      .w800,
+                                                  fontSize: 30,
+                                                  color:
+                                                  Colors.green),
+                                            ) :Text("OUT",
+                                              style: TextStyle(
+                                                  fontWeight:
+                                                  FontWeight
+                                                      .w800,
+                                                  fontSize: 30,
+                                                  color:
+                                                  Colors.green),
+                                            )
+                                        ),
                                         SizedBox(
                                           width: 10,
                                         ),

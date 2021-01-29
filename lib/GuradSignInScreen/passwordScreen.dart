@@ -1,15 +1,15 @@
-import 'dart:convert';
-
+import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
-import 'package:guard/GuradSignInScreen/TabBarScreen.dart';
 import 'package:guard/MainScreen/mainScreen.dart';
-import 'package:guard/ModelClass/Devices.dart';
 import 'package:imei_plugin/imei_plugin.dart';
+
 class PasswordScreen extends StatefulWidget {
   @override
   _PasswordScreenState createState() => _PasswordScreenState();
@@ -18,6 +18,9 @@ class PasswordScreen extends StatefulWidget {
 class _PasswordScreenState extends State<PasswordScreen> {
   TextEditingController _passwordController = TextEditingController();
   bool isLoading = false;
+  final formKey = GlobalKey<FormState>();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  StreamSubscription iosSubscription;
 
   String _platformImei = 'Unknown';
   String uniqueId = "Unknown";
@@ -25,7 +28,55 @@ class _PasswordScreenState extends State<PasswordScreen> {
   void initState() {
     super.initState();
     initPlatformState();
+    if (Platform.isIOS) {
+      iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
+      });
+      _fcm.requestNotificationPermissions(IosNotificationSettings());
+    }
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        // GetExpectedVisitors();
+        print("onMessage: $message");
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(message['notification']['title']),
+              subtitle: Text(message['notification']['body']),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        messagehandle(message, context);
+
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        messagehandle(message, context);
+
+      },
+    );
   }
+  void messagehandle(msg,context){
+    print(msg["data"]);
+    print("aaddd");
+    switch (msg['data']['screen']){
+      case "AlertsScreen":
+      //  Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationDetailsPage(ModalRoute.of(context).settings.arguments),));
+
+        break;
+    }
+  }
+
 
 
   Future<void> initPlatformState() async {
@@ -68,7 +119,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       height: 10,
                     ),
                     Form(
-                        key: globals.formKey,
+                        key: formKey,
                         child: Column(
                           children: [
                             constantTextField().InputField(
@@ -119,13 +170,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
 
   getActivationCode() async {
-    if (globals.formKey.currentState.validate()) {
+    if (formKey.currentState.validate()) {
       await Firestore.instance
           .collection(globals.SOCIETY)
           .getDocuments()
         .then((value) {
-          print(value.documents[0]['password']);
-            print("${value.documents[0]['password']}");
+         // print(value.documents[0]['password']);
+           // print("${value.documents[0]['password']}");
 
             if("${value.documents[0]['password']}" == _passwordController.text){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));

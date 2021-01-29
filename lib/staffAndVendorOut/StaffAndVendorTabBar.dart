@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+//import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:guard/Constant/ConstantTextField.dart';
 import 'package:guard/Constant/Constant_Color.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
+import 'package:guard/ModelClass/HouseModel.dart';
 import 'package:guard/ModelClass/MaidModel.dart';
 
 class StaffAndVandorTabBar extends StatefulWidget {
@@ -49,6 +51,8 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
     // TODO: implement initState
     super.initState();
     getSocietyrServices(lastDocument);
+
+   // getHouseToken();
     _tabController = new TabController(length: 2, vsync: this);
   }
 
@@ -285,7 +289,8 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
       querySnapshot = await Firestore.instance
           .collection(globals.SOCIETY)
           .document(globals.mainId)
-          .collection(widget.staffType)
+          .collection("LocalServices")
+        .where("service",isEqualTo: widget.staffType)
           .where('enable', isEqualTo: true)
           .limit(documentLimit)
           .getDocuments();
@@ -293,7 +298,8 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
       querySnapshot = await Firestore.instance
           .collection(globals.SOCIETY)
           .document(globals.mainId)
-          .collection(widget.staffType)
+          .collection("LocalServices")
+          .where("service",isEqualTo: widget.staffType)
           .where('enable', isEqualTo: true)
           .startAfterDocument(_lastDocument)
           .limit(documentLimit)
@@ -397,28 +403,40 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
 
   _checkOut() async {
     print("start checkout");
+    print(globals.SOCIETY);
+    print(globals.mainId);
     await Firestore.instance
         .collection(globals.SOCIETY)
         .document(globals.mainId)
-        .collection(widget.staffType)
+        .collection("LocalServices")
         .where("password", isEqualTo: _passwordController.text)
         .getDocuments()
         .then((value) {
+      print(value);
       value.documents.forEach((element) {
+        element['HouseId'].forEach((element){
+          if(element['enable'] == true){
+            getToken(element['id'],"is checkOut the society");
+
+          }
+        });
         print("data checkout");
         print(element['documentNumber']);
         Firestore.instance
             .collection(globals.SOCIETY)
             .document(globals.mainId)
-            .collection(widget.staffType)
+            .collection("LocalServices")
             .document(element['documentNumber'])
             .setData({"passwordEnable": false}, merge: true).then(onGoBack);
         _showCheckOutDialog(value);
-        sendNotificationToHouseMember(element['documentNumber'],"is checkOut the society");
+       // sendNotificationToHouseMember(element['documentNumber'],"is checkOut the society");
       });
     });
 
   }
+
+
+
 
   Future<void> _showCheckOutDialog(QuerySnapshot data) async {
     data.documents.forEach((element) {
@@ -512,30 +530,53 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
       );
     });
   }
+  // getHouseToken() async {
+  //   Firestore.instance
+  //       .collection(globals.SOCIETY)
+  //       .document(globals.mainId)
+  //       .collection(globals.LOCALSERVICES)
+  //       .getDocuments()
+  //       .then((value) {
+  //     value.documents.forEach((value) {
+  //       value['HouseId'].forEach((element){
+  //         if(element['enable'] == true){
+  //           print("FVSDFVSDFBSDFBSDF is ${element['id']}");
+  //         }
+  //       });
+  //     });
+  //   });
+  // }
 
   _checkIn() {
     Firestore.instance
         .collection(globals.SOCIETY)
         .document(globals.mainId)
-        .collection(widget.staffType)
+        .collection("LocalServices")
         .where("password", isEqualTo: _passwordController.text)
         .getDocuments()
         .then((value) {
+          print(value);
       value.documents.forEach((element) {
+        element['HouseId'].forEach((element){
+          if(element['enable'] == true){
+            getToken(element['id'],'is checkIn the society');
+          }
+        });
         print(element['documentNumber']);
         Firestore.instance
             .collection(globals.SOCIETY)
             .document(globals.mainId)
-            .collection(widget.staffType)
+            .collection("LocalServices")
             .document(element['documentNumber'])
             .setData({"passwordEnable": true}, merge: true).then(onGoBack);
         _showCheckInDialog(value);
-
-        sendNotificationToHouseMember(element['documentNumber'],'is checkIn the society');
+       // sendNotificationToHouseMember(element['documentNumber'],'is checkIn the society');
         _passwordController.clear();
       });
     });
   }
+
+
 
   Future<void> _showCheckInDialog(QuerySnapshot data) async {
     data.documents.forEach((element) {
@@ -628,30 +669,32 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
     });
   }
   
-  sendNotificationToHouseMember(String staffDocument,String msg1){
-    print(staffDocument);
-    print("gfjhfj");
-    print(widget.staffType);
-    Firestore.instance.collection(globals.SOCIETY)
-        .document(globals.mainId)
-        .collection("HouseDevices")
-         .where(widget.staffType,isEqualTo: staffDocument)
-        .where("enable",isEqualTo: true)
-        .getDocuments().then((value) {
-      value.documents.forEach((element) {
-        print(element['token']);
-        print("hhhhhh");
-        sendNotification(element['token'], widget.staffType, msg1) ;
-      });
-    });
-  }
+  // sendNotificationToHouseMember(String staffDocument,String msg1){
+  //   print(staffDocument);
+  //   print("gfjhfj");
+  //   print(widget.staffType);
+  //   Firestore.instance.collection(globals.SOCIETY)
+  //       .document(globals.mainId)
+  //       .collection("HouseDevices")
+  //        //.where(widget.staffType,isEqualTo: staffDocument)
+  //       .where("enable",isEqualTo: true)
+  //       .getDocuments().then((value) {
+  //     value.documents.forEach((element) {
+  //       print(element['token']);
+  //       print("hhhhhh");
+  //       sendNotification(element['token'], widget.staffType, msg1) ;
+  //     });
+  //   });
+  // }
 
 
   static Future<void> sendNotification(receiver, msg,name) async {
     final postUrl = 'https://fcm.googleapis.com/fcm/send';
 
 
-    final data = {
+    final data =
+
+    {
       "notification": {"body": name, "title": msg},
       "priority": "high",
       "data": {
@@ -674,6 +717,7 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
       },
       "to": "$receiver"
     };
+
 
 
     final headers = {'content-type': 'application/json', 'Authorization': globals.notificationKey};
@@ -699,4 +743,30 @@ class _StaffAndVandorTabBarState extends State<StaffAndVandorTabBar>
     hasMore = true;
     getSocietyrServices(null);
   }
+
+
+  getToken(String houseId,String msg) async {
+    Firestore.instance
+        .collection(globals.SOCIETY)
+        .document(globals.mainId)
+        .collection(globals.HOUSESDEVICES)
+        .where("houseId",isEqualTo: houseId)
+        .getDocuments()
+        .then((value) {
+      value.documents.forEach((value) {
+      print(value['token']);
+      sendNotification(value['token'],widget.staffType, msg);
+
+
+      });
+    });
+  }
+
+
+
+
+
+
+
+
 }

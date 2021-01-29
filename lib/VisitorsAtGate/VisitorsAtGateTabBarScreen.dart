@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,7 +46,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
   void initState() {
     super.initState();
     globals.image = null;
-    globals.type = 'Select Type';
+    globals.type = 'Select Visitor';
     globals.number = "0";
 
     _tabController = new TabController(length: 2, vsync: this);
@@ -130,13 +127,13 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
                         "Enter Flat Number",
                         "",
                         validationKey.flatNo,
-                        globals.mobileNumberController,
+                        _flatNumberController,
                         false,
                         IconButton(
                             icon: Icon(Icons.contact_phone), onPressed: () {}),
                         1,
                         1,
-                        TextInputType.number,
+                        TextInputType.name,
                         false),
                     SizedBox(
                       height: 20,
@@ -271,8 +268,9 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
               RaisedButton(
                 color: UniversalVariables.background,
                 onPressed: () {
-                visitors();
-                   globals.uuid = Uuid().v1();
+                  sendNotification( token,"khgfhgfgmjh");
+                // visitors();
+                //    globals.uuid = Uuid().v1();
                 },
                 child: Text(
                   "Add",
@@ -297,19 +295,28 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
 
 
   visitors() {
+    print("aaaa");
     if (formKey.currentState.validate()) {
+      print("bbbb");
+      print(globals.type);
       if(globals.type == "Select Visitor" || globals.number == "0"){
         showScaffold("Select visitor type or Visitor Number");
+        print("cccc");
 
-      }else{
+      }else {
+        print("hhhh");
       Firestore.instance
           .collection(globals.SOCIETY)
           .document(globals.mainId)
           .collection("Houses")
-          .where("flatNumber", isEqualTo: "C32")
+          .where("flatNumber", isEqualTo: _flatNumberController.text)
           .getDocuments()
           .then((value) {
+
         value.documents.forEach((element) {
+          print(element['houseId']);
+          print(element['flatNumber']);
+          print("visitors");
           Visitor visitor = Visitor(
               name: _nameController.text,
               inviteBye: "Guard",
@@ -331,6 +338,14 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
               .setData(jsonDecode(jsonEncode(visitor.toJson())),merge: true)
               .then((value) {
             _showDialog();
+            _flatNumberController.clear();
+            _mobileNumberController.clear();
+            _nameController.clear();
+           setState(() {
+             globals.type = 'Select Visitor';
+             globals.number = "0";
+           });
+
 
           });sendNotificationToHouseMember(element['houseId']);
         });
@@ -350,7 +365,7 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
             child: ListBody(
               children: <Widget>[
                 Text(
-                  "Visitor is added Notification is send to the user mobile number",
+                  "Visitor is added & notification is sent to user's mobile ",
                   style: TextStyle(color: UniversalVariables.background),
                 )
               ],
@@ -368,21 +383,74 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
       },
     );
   }
+  // static Future<void> sendNotification(receiver, msg,) async {
+  //   final postUrl = 'https://fcm.googleapis.com/fcm/send';
+  //
+  //
+  //   final data = {
+  //     "notification": {"body": "Accept Reques", "title": msg},
+  //     "priority": "high",
+  //     "data": {
+  //       "click_action": "FLUTTER_NOTIFICATION_CLICK",
+  //       "id": "1",
+  //       "status": "done",
+  //       "screen":"Visitors",
+  //       "name":"hhhhh"
+  //
+  //     },
+  //     "to": "$receiver"
+  //   };
+  //
+  //
+  //   final headers = {'content-type': 'application/json', 'Authorization': globals.notificationKey};
+  //   BaseOptions options = new BaseOptions(
+  //     connectTimeout: 5000,
+  //     receiveTimeout: 3000,
+  //     headers: headers,
+  //   );
+  //
+  //   try {
+  //     print("dfsdfsd   ${receiver}");
+  //     final response = await Dio(options).post(postUrl, data: jsonEncode(data));
+  //     if (response.statusCode == 200) {
+  //       Fluttertoast.showToast(msg: 'Request Sent To HouseMember');
+  //       print('visitorName');
+  //     } else {
+  //       print('notification sending failed');
+  //     }
+  //   } catch (e) {
+  //     print('exception $e');
+  //   }
+  // }
+
+
+
   static Future<void> sendNotification(receiver, msg,) async {
     final postUrl = 'https://fcm.googleapis.com/fcm/send';
-
-
     final data = {
-      "notification": {"body": "Accept Reques", "title": msg},
+      "notification": {"body": "msg", "title": "Alert"},
       "priority": "high",
       "data": {
         "click_action": "FLUTTER_NOTIFICATION_CLICK",
         "id": "1",
         "status": "done",
-        "screen":"_showDialog",
+        "screen":"AlertsScreen",
         "name":"hhhhh"
 
       },
+      "actionButtons": [
+        {
+          "key": "REPLY",
+          "label": "Reply",
+          "autoCancel": true,
+          "buttonType":  "InputField",
+        },
+        {
+          "key": "ARCHIVE",
+          "label": "Archive",
+          "autoCancel": true
+        }
+      ],
       "apns": {
         "payload": {
           "aps": {
@@ -408,7 +476,6 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
       final response = await Dio(options).post(postUrl, data: jsonEncode(data));
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: 'Request Sent To HouseMember');
-        print('visitorName');
       } else {
         print('notification sending failed');
       }
@@ -437,3 +504,4 @@ class _StaffAndVandorTabBarState extends State<VisitorsAtGateTabBar>
   }
 
 }
+var token = "eNnqgunhT6mvk9WlIKhpDc:APA91bH9iYN_YYMcA2Zz8-uVHmKXkaWJcsXnQ74EbLhKMM4jD2X7LNjAhemIlxy69RzQPbq70jahz1GJtn382Tt5EESblirtyCZZVw7F8K4ysDN5eF3d81ER-r8n5smNouMgx3LncN6a";

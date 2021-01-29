@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guard/Bloc/AuthBloc.dart';
@@ -13,12 +11,11 @@ import 'package:guard/ModelClass/ActivationModel.dart';
 import 'package:guard/ModelClass/Devices.dart';
 import 'package:guard/ModelClass/userModelClass.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:imei_plugin/imei_plugin.dart';
-import 'package:uuid/uuid.dart';
 
-import 'TabBarScreen.dart';
+
+
 
 class ActivationScreen extends StatefulWidget {
   @override
@@ -28,6 +25,7 @@ class ActivationScreen extends StatefulWidget {
 class _ActivationScreenState extends State<ActivationScreen> {
   TextEditingController _activationController = TextEditingController();
   UserData _userData = UserData();
+  final formKey = GlobalKey<FormState>();
   List<ActivationCode> activationCodelist = List<ActivationCode>();
 
   bool isLoading = false;
@@ -87,7 +85,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
                   height: 10,
                 ),
                 Form(
-                    key: globals.formKey,
+                    key: formKey,
                     child: Column(
                       children: [
                         constantTextField().InputField(
@@ -172,7 +170,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
   }
 
   getActivationCode() async {
-    if (globals.formKey.currentState.validate()) {
+    if (formKey.currentState.validate()) {
       await Firestore.instance
           .collection('ActivationCode')
           .where("tokenNo", isEqualTo: _activationController.text)
@@ -183,25 +181,26 @@ class _ActivationScreenState extends State<ActivationScreen> {
         print(value.documents.length);
 
         value.documents.forEach((element) {
-          print(element["iD"]);
-        });
+          if (_activationController.text == element["tokenNo"]) {
+            setState(() {
+              globals.mainId = value.documents[0]["society"];
+              savelocalCode().toSaveStringValue(
+                  residentHouseId, value.documents[0]["society"]);
+            });
+            saveAccesList(value);
+            disableSocietyId(value.documents[0]['iD']);
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => PasswordScreen(
+                    )));
+          } else {
+            _showDialog();
+          }
 
-        if (value.documents.length == 1) {
-          setState(() {
-            globals.mainId = value.documents[0]["society"];
-            savelocalCode().toSaveStringValue(
-                residentHouseId, value.documents[0]["society"]);
-          });
-          saveAccesList(value);
-          disableSocietyId(value.documents[0]['iD']);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => PasswordScreen(
-                  )));
-        } else {
-          _showDialog();
-        }
+        });
+       // value.documents.length == 1
+
       });
     }
   }

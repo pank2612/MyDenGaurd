@@ -154,9 +154,8 @@ class _VisitorsCheckOutState extends State<VisitorsCheckOut>  with SingleTickerP
                                     minRadius: 30,
                                     child: visitorsList[index]
                                         .inOut ==
-                                        true
-                                        ? Text(
-                                      "OUT",
+                                        null
+                                        ? Text("",
                                       style: TextStyle(
                                           fontWeight:
                                           FontWeight
@@ -165,16 +164,26 @@ class _VisitorsCheckOutState extends State<VisitorsCheckOut>  with SingleTickerP
                                           color:
                                           Colors.green),
                                     )
-                                        : Text(
-                                      "IN",
+                                        : visitorsList[index]
+                                        .inOut ==
+                                        true
+                                        ? Text("OUT",
                                       style: TextStyle(
                                           fontWeight:
                                           FontWeight
                                               .w800,
-                                          fontSize: 25,
+                                          fontSize: 30,
                                           color:
                                           Colors.green),
-                                    ),
+                                    ):Text("IN",
+                                      style: TextStyle(
+                                          fontWeight:
+                                          FontWeight
+                                              .w800,
+                                          fontSize: 30,
+                                          color:
+                                          Colors.green),
+                                    )
                                   ),
                                   SizedBox(
                                     width: 10,
@@ -400,7 +409,7 @@ class _VisitorsCheckOutState extends State<VisitorsCheckOut>  with SingleTickerP
           setState(() {
             isLoading = false;
           });
-          showScaffold("Visitors Exist");
+          showScaffold("Visitors Check out The Society");
           _passwordController.clear();
     }).then(onGoBack);
   }

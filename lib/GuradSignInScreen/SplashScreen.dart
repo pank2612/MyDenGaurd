@@ -38,30 +38,24 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
 
-
-
-
   @override
   void initState() {
     _getUserData().then((fUser) {
-
       if(fUser!=null) {
         print("fuser length");
+        print("11111111111111     ${fUser.accessList}");
         if(!fUser.emailVerified){
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => EmailVerification()));
         }
         else if( fUser.accessList != null && fUser.accessList.length == 1 ) {
           global.mainId = fUser.accessList[0].id.toString();
-        //  global.parentId = fUser.accessList[0].residentId.toString();
-         // global.flatNo = fUser.accessList[0].flatNo.toString();
+          print("aaaaaaaaaaaaa${global.mainId}");
+
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => PasswordScreen()));
         }
-        // else if ( fUser.accessList != null && fUser.accessList.length > 1){
-        //   Navigator.pushReplacement(
-        //       context, MaterialPageRoute(builder: (context) => accessList()));
-        // }
+
 
         else {
           Navigator.pushReplacement(context,
@@ -80,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       _fcm.configure(
         onMessage: (Map<String, dynamic> message) async {
-          // GetExpectedVisitors();
+
           print("onMessage: $message");
 
           showDialog(

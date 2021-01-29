@@ -2,23 +2,16 @@
 
 import 'dart:async';
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-
-
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'Bloc/ConnectivityBloc.dart';
 import 'Bloc/MainBloc.dart';
 import 'package:guard/Constant/globalVeriable.dart' as globals;
-
 import 'GuradSignInScreen/SplashScreen.dart';
-import 'MainScreen/mainScreen.dart';
+
 
 
 //test
@@ -87,10 +80,7 @@ class _MyAppState extends State<MyApp> {
 
     globals.connectivityBloc = ConnectivityBloc();
     globals.connectivityBloc.onInitial();
-
-
     super.initState();
-
     if (Platform.isIOS) {
       iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
       });
